@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <title>Indoor localization</title>
+</head>
+
+<body>
+    <div class="container">
+        <svg id="svg" height="437" width="1230" style="background-color: rgb(219, 219, 219);" class="mt-5">
+            <!-- <rect id="location-1" x="0" y="0" height="437" width="1150" style="fill:gray" /> -->
+            <!-- doctor tamer room -->
+            <rect id="drtamer" x="301.6" y="94" width="102" height="94"
+                style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+            <!-- zero class -->
+            <rect id="class0" x="80" y="185" width="221.6" height="46.4"
+                style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+            <!-- first class -->
+            <rect id="class1" x="301.6" y="185" width="267" height="46.4"
+                style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+            <!-- second class -->
+            <rect id="class2" x="568.6" y="185" width="185" height="46.4"
+                style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+            <!-- third class -->
+            <rect id="class3" x="833.6" y="185" width="300.2" height="46.4"
+                style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+            <!-- elmodarg class -->
+            <rect id="elmodarg" x="855.6" y="232" width="278.2" height="202.6"
+                style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+            <!-- lab -->
+            <rect id="lab1" x="493.6" y="0" width="75" height="185"
+                style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+            <line id="Line" x1="80" y1="0" x2="80" y2="1230" style="stroke:black;stroke-width:2" />
+            <!-- stars -->
+            <rect id="slm" x="0" y="185" width="80" height="46.4"
+                style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+        </svg>
+    </div>
+</body>
+<script>
+    let mapToId = {
+        class0 : "class-0",
+        class1 : "class-1",
+        class2 : "class-2",
+        class3 : "class-3",
+        class2 : "class-2",
+
+    };
+    function classReached(id){
+        const element = document.getElementById(id);
+        element.setAttribute("style","fill:red;stroke:black;stroke-width:1;opacity:0.8")
+    }
+    classReached("elmodarg")
+    function scale(x, y) {
+        const svg = document.getElementById("svg");
+        let svgWidth = svg.getAttribute("width");
+        let svgHeight = svg.getAttribute("height");
+        svg.setAttribute("width", String(Number(svgWidth) * x));
+        svg.setAttribute("height", String(Number(svgHeight) * y));
+        for (let i = 0; i < svg.children.length; i++) {
+            if (svg.children[i].id === "Line") {
+                let currX1 = svg.children[i].getAttribute("x1");
+                let currY1 = svg.children[i].getAttribute("y1");
+                let currX2 = svg.children[i].getAttribute("x2");
+                let currY2 = svg.children[i].getAttribute("y2");
+                svg.children[i].setAttribute("x1", String(Number(currX1) * x));
+                svg.children[i].setAttribute("y1", String(Number(currY1) * y));
+                svg.children[i].setAttribute("x2", String(Number(currX2) * x));
+                svg.children[i].setAttribute("y2", String(Number(currY2) * y));
+            }
+            let currX = svg.children[i].getAttribute("x");
+            let currY = svg.children[i].getAttribute("y");
+            let currWidth = svg.children[i].getAttribute("width");
+            let currHeight = svg.children[i].getAttribute("height");
+            svg.children[i].setAttribute("x", String(Number(currX) * x));
+            svg.children[i].setAttribute("y", String(Number(currY) * y));
+            svg.children[i].setAttribute("width", String(Number(currWidth) * x));
+            svg.children[i].setAttribute("height", String(Number(currHeight) * y));
+            console.log();
+        }
+    }
+    scale(0.7, 0.7);
+    const icon = document.getElementById("icon")
+    setInterval(() => {
+        icon.setAttribute("cx", Math.floor(Math.random() * (400 - 0)) + 0);
+        icon.setAttribute("cy", Math.floor(Math.random() * (400 - 0)) + 0);
+    }, 500);
+</script>
+
+</html>
