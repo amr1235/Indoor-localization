@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+<script>
+    const ws = new WebSocket("ws://localhost:3000/sensor");
+    ws.onopen = () => {
+        let data = true;
+        setInterval(()=> {
+            ws.send("-72.0,-54.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-83.0\n");
+        },2000)
+        console.log("[CONNECTED]");
+    }
+    ws.onclose = () => {
+        console.log("[DISCONNECTED]");
+    }
+    ws.onmessage = (msg) => {
+        console.log(`[RECIEVED]: ${msg.data}`);
+        classReached(msg.data);
+    }
+</script>
+
+</html>

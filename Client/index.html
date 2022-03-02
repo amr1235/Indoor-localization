@@ -7,54 +7,107 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <title>Indoor localization</title>
+    <style>
+        @media screen and (max-width:600px) {
+            #rows {
+                margin-top: 40%;
+            }
+
+            .marginTop {
+                margin-top: 2%;
+            }
+            .text{
+                font-size: x-small;
+            }
+        }
+    </style>
 </head>
 
 <body>
     <div class="container">
-        <svg id="svg" height="437" width="1230" style="background-color: rgb(219, 219, 219);" class="mt-5">
-            <!-- <rect id="location-1" x="0" y="0" height="437" width="1150" style="fill:gray" /> -->
-            <!-- doctor tamer room -->
-            <rect id="drtamer" x="301.6" y="94" width="102" height="94"
-                style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
-            <!-- zero class -->
-            <rect id="class0" x="80" y="185" width="221.6" height="46.4"
-                style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
-            <!-- first class -->
-            <rect id="class1" x="301.6" y="185" width="267" height="46.4"
-                style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
-            <!-- second class -->
-            <rect id="class2" x="568.6" y="185" width="185" height="46.4"
-                style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
-            <!-- third class -->
-            <rect id="class3" x="833.6" y="185" width="300.2" height="46.4"
-                style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
-            <!-- elmodarg class -->
-            <rect id="elmodarg" x="855.6" y="232" width="278.2" height="202.6"
-                style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
-            <!-- lab -->
-            <rect id="lab1" x="493.6" y="0" width="75" height="185"
-                style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
-            <line id="Line" x1="80" y1="0" x2="80" y2="1230" style="stroke:black;stroke-width:2" />
-            <!-- stars -->
-            <rect id="slm" x="0" y="185" width="80" height="46.4"
-                style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
-        </svg>
+        <div id="rows">
+            <div class="row mt-5">
+                <div class="col">
+                    <svg id="svg" height="437" width="1230" style="background-color: rgb(219, 219, 219);">
+                        <!-- <rect id="location-1" x="0" y="0" height="437" width="1150" style="fill:gray" /> -->
+                        <!-- doctor tamer room -->
+                        <rect id="drtamer" x="301.6" y="94" width="102" height="94"
+                            style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+                        <text x="336" class="text" y="141" fill="black">216</text>
+                        <!-- zero class -->
+                        <rect id="class0" x="80" y="185" width="221.6" height="46.4"
+                            style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+                        <text x="150" class="text" y="215" fill="black">corridor 0</text>
+                        <!-- first class -->
+                        <rect id="class1" x="301.6" y="185" width="267" height="46.4"
+                            style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+                        <text x="390" class="text" y="215" fill="black">corridor 1</text>
+                        <!-- second class -->
+                        <rect id="class2" x="568.6" y="185" width="185" height="46.4"
+                            style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+                        <text x="610" class="text" y="215" fill="black">corridor 2</text>
+                        <!-- third class -->
+                        <rect id="class3" x="833.6" y="185" width="300.2" height="46.4"
+                            style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+                        <text x="930" class="text" y="215" fill="black">corridor 2</text>
+                        <!-- elmodarg class -->
+                        <rect id="elmodarg" x="855.6" y="232" width="278.2" height="202.6"
+                            style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+                        <text x="975" class="text" y="340" fill="black">201</text>
+                        <!-- lab -->
+                        <rect id="lab1" x="493.6" y="0" width="75" height="185"
+                            style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+                        <text x="515" class="text" y="141" fill="black">213</text>
+                        <line id="Line" x1="80" y1="0" x2="80" y2="1230" style="stroke:black;stroke-width:2" />
+                        <!-- stars -->
+                        <rect id="slm" x="0" y="185" width="80" height="46.4"
+                            style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+                        <text x="15" class="text" y="215" fill="black">stairs</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
+<script src="./main.js"></script>
 <script>
-    let mapToId = {
-        class0 : "class-0",
-        class1 : "class-1",
-        class2 : "class-2",
-        class3 : "class-3",
-        class2 : "class-2",
-
-    };
-    function classReached(id){
+    swInit();
+</script>
+<script>
+    function classReached(id) {
         const element = document.getElementById(id);
-        element.setAttribute("style","fill:red;stroke:black;stroke-width:1;opacity:0.8")
+        element.setAttribute("style", "fill:red;stroke:black;stroke-width:1;opacity:0.8");
     }
-    classReached("elmodarg")
+    // classReached("elmodarg");
+    // document.getElementById("svg").setAttribute("width",window.innerWidth * 0.5);
+    // document.getElementById("svg").setAttribute("height",window.innerHeight * 0.5);
+    // scale(1,1);
+    console.log(document.body.clientHeight);
+    if(isMobile()){
+        // scale(0.6, 0.6)
+        setWidth(640);
+        setHeight(250);
+        const texts = document.getElementsByClassName("text");
+        for (let i = 0; i < texts.length; i++) {
+            texts[i].setAttribute("x",Number(texts[i].getAttribute("x")) - 10);  
+        }
+    }else {
+        scale(0.8,0.8);
+    }
+    function isMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    if (window.innerWidth <= 400) {
+    }
+    setWidth(window.innerWidth);
+    function setWidth(width) {
+        const svg = document.getElementById("svg");
+        scale(width / 1230, 1);
+    }
+    function setHeight(height) {
+        const svg = document.getElementById("svg");
+        scale(1, height / 437);
+    }
     function scale(x, y) {
         const svg = document.getElementById("svg");
         let svgWidth = svg.getAttribute("width");
@@ -83,12 +136,19 @@
             console.log();
         }
     }
-    scale(0.7, 0.7);
-    const icon = document.getElementById("icon")
-    setInterval(() => {
-        icon.setAttribute("cx", Math.floor(Math.random() * (400 - 0)) + 0);
-        icon.setAttribute("cy", Math.floor(Math.random() * (400 - 0)) + 0);
-    }, 500);
+    // scale(0.7, 0.7);
+    const ws = new WebSocket("ws://localhost:3000/client")
+    ws.onopen = () => {
+        let data = true;
+        console.log("[CONNECTED]");
+    }
+    ws.onclose = () => {
+        console.log("[DISCONNECTED]");
+    }
+    ws.onmessage = (msg) => {
+        console.log(`[RECIEVED]: ${msg.data}`);
+        classReached(msg.data);
+    }
 </script>
 
 </html>

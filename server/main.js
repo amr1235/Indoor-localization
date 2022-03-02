@@ -1,8 +1,9 @@
 const { EventEmitter } = require("events");
 const { Server } = require("ws");
+const { spawn } = require('child_process');
+const ls = spawn('python', ['process.py']);
 const express = require("express")
 const cors = require("cors");
-const http = require("http");
 let server = express();
 
 server.use(cors());
@@ -13,13 +14,17 @@ const bus = new EventEmitter();
 
 const subscribers = [];
 let publisher = null;
-bus.on("update", async (data) => {
-    let parsedData = JSON.parse(data);
-    let features = Object.values(parsedData);
-    
+
+ls.stdout.on('data', (predictedValue) => {
+    console.log(predictedValue.toString());
     subscribers.forEach((sub) => {
-        sub.send(data, { binary: false });
-    })
+        sub.send(predictedValue, { binary: false });
+    });
+});
+
+bus.on("update", async (data) => {
+    console.log("update : " +data.toString());
+    ls.stdin.write(data.toString(), () => { });
 });
 bus.on("command", (cmd) => {
     type = String(cmd);
@@ -35,13 +40,27 @@ ws.on("connection", (socket, req) => {
                 bus.emit("update", msg);
             });
             break;
-            case "/client":
+        case "/client":
             subscribers.push(socket);
             socket.on("message", (cmd) => {
                 bus.emit("command", cmd);
             });
             break
-            default:
-                break;
+        default:
+            break;
     }
 });
+
+
+
+
+ls.stderr.on('data', (data) => {
+    console.error(`stderr: ${data}`);
+});
+ls.on('close', (code) => {
+    // console.log(child process exited with code ${code});
+});
+
+// setInterval(() => {
+//     ls.stdin.write("3", () => { });
+// }, 2000);
