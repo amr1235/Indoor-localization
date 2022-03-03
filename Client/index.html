@@ -190,7 +190,7 @@
     ws.onmessage = (msg) => {
         console.log(`[RECIEVED]: ${msg.data}`);
         if(prevClass) {
-            clearClass(msg.data);
+            clearClass(prevClass);
         }
         classReached(msg.data);
         readings.push(msg.data);

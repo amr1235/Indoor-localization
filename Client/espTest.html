@@ -13,11 +13,18 @@
 </body>
 <script>
     const ws = new WebSocket("ws://localhost:3000/sensor");
+    let testData = ["-53.0,-100.0,-100.0,-100.0,-100.0,-72.0,-100.0,-100.0,-100.0\n","-72.0,-54.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-83.0\n"];
+    let i = 0;
     ws.onopen = () => {
         let data = true;
         setInterval(()=> {
-            ws.send("-72.0,-54.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-83.0\n");
-        },2000)
+            ws.send(testData[i]);
+            if(i === 0){
+                i = 1;
+            }else {
+                i = 0;
+            }
+        },2000);
         console.log("[CONNECTED]");
     }
     ws.onclose = () => {
