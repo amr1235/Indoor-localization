@@ -70,8 +70,8 @@
         </div>
         <div class="row justify-content-center">
             <div class="col d-flex justify-content-center mt-5">
-                <button id="replayButton" onclick="replayLastTen()" class="btn btn-success" style="margin-right: 20px;">replay last 10 readings</button>
-                <button id="keepTrackButton" onclick="keepTrack()" class="btn btn-primary">Keep Track</button>
+                <button id="replayButton" onclick="replayLastTen()" disabled class="btn btn-success" style="margin-right: 20px;">replay last 10 readings</button>
+                <button id="keepTrackButton" onclick="keepTrack()" disabled class="btn btn-primary">Keep Track</button>
             </div>
         </div>
     </div>
@@ -81,10 +81,10 @@
     swInit();
 </script>
 <script>
-    const ws = new WebSocket("ws://localhost:3000/client");
-    let readings = ["class0","class1","class2","class3","class2","class1","class0","class1","class2","class3"];
+    let ws = new WebSocket("ws://localhost:3000/client");
+    let readings = [];
     function keepTrack() {
-        ws.open();
+        ws = new WebSocket("ws://localhost:3000/client");
         const replayButton = document.getElementById("replayButton");
         const keepTrackButton = document.getElementById("keepTrackButton");
         replayButton.disabled = true;
