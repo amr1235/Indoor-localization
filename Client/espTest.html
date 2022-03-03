@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Document</title>
 </head>
 
@@ -13,10 +13,19 @@
 </body>
 <script>
     const ws = new WebSocket("ws://localhost:3000/sensor");
+    let data = [
+        "-100,-73,-100,-100,-100,-100,-100,-100,-100\n", //slm
+        "-100,-59,-100,-68,-100,-100,-100,-52,-78\n", //lab1
+        "-41,-88,-100,-100,-100,-85,-100,-100,-100\n", //modarag
+        "-100,-69,-76,-100,-68,-100,-100,-93,-100\n", //drtamer
+        "-36,-67,-100,-100,-100,-100,-100,-100,-100\n", //class3
+        "-69,-100,-100,-62,-100,-100,-100,-81,-69\n", //class2
+        "-68,-57,-100,-100,-51,-100,-65,-100,-100\n", //class1
+        "-69,-61,-100,-100,-40,-100,-50,-86,-100\n", //class0
+    ];
     ws.onopen = () => {
-        let data = true;
         setInterval(()=> {
-            ws.send("-72.0,-54.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-83.0\n");
+            ws.send(data[Math.round(Math.random() * 8)]);
         },2000)
         console.log("[CONNECTED]");
     }

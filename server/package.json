@@ -5,8 +5,13 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start" : "node main.js"
+    "start": "node main.js"
   },
   "author": "amr,zeyad",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.3",
+    "ws": "^8.5.0"
+  }
 }
