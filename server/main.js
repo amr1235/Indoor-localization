@@ -16,18 +16,19 @@ const subscribers = [];
 let publisher = null;
 
 ls.stdout.on('data', (predictedValue) => {
-    console.log(predictedValue.toString());
+    console.log("Prediction: " + predictedValue.toString());
     subscribers.forEach((sub) => {
         sub.send(predictedValue, { binary: false });
     });
 });
 
-bus.on("update", async (data) => {
-    console.log("update : " +data.toString());
-    ls.stdin.write(data.toString(), () => { });
+bus.on("update", (data) => {
+    if (data.toString()) {
+        console.log("Reading : " + data.toString());
+        ls.stdin.write(data.toString(), () => { });
+    }
 });
 bus.on("command", (cmd) => {
-    type = String(cmd);
     if (publisher) {
         publisher.send(cmd, { binary: false });
     }
