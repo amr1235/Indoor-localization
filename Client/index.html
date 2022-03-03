@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <title>Indoor localization</title>
+    <style>
+        @media screen and (max-width:600px) {
+            #rows {
+                margin-top: 40%;
+            }
+
+            .marginTop {
+                margin-top: 2%;
+            }
+
+            .text {
+                font-size: x-small;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div id="rows">
+            <div class="row mt-5">
+                <div class="col">
+                    <svg id="svg" height="437" width="1230" style="background-color: rgb(219, 219, 219);">
+                        <!-- <rect id="location-1" x="0" y="0" height="437" width="1150" style="fill:gray" /> -->
+                        <!-- doctor tamer room -->
+                        <rect id="drtamer" x="301.6" y="94" width="102" height="94"
+                            style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+                        <text x="336" class="text" y="141" fill="black">216</text>
+                        <!-- zero class -->
+                        <rect id="class0" x="80" y="185" width="221.6" height="46.4"
+                            style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+                        <text x="150" class="text" y="215" fill="black">corridor 0</text>
+                        <!-- first class -->
+                        <rect id="class1" x="301.6" y="185" width="267" height="46.4"
+                            style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+                        <text x="390" class="text" y="215" fill="black">corridor 1</text>
+                        <!-- second class -->
+                        <rect id="class2" x="568.6" y="185" width="185" height="46.4"
+                            style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+                        <text x="610" class="text" y="215" fill="black">corridor 2</text>
+                        <!-- third class -->
+                        <rect id="class3" x="833.6" y="185" width="300.2" height="46.4"
+                            style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+                        <text x="930" class="text" y="215" fill="black">corridor 3</text>
+                        <!-- elmodarg class -->
+                        <rect id="Modarg" x="855.6" y="232" width="278.2" height="202.6"
+                            style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+                        <text x="975" class="text" y="340" fill="black">201</text>
+                        <!-- lab -->
+                        <rect id="lab1" x="493.6" y="0" width="75" height="185"
+                            style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+                        <text x="515" class="text" y="141" fill="black">213</text>
+                        <line id="Line" x1="80" y1="0" x2="80" y2="1230" style="stroke:black;stroke-width:2" />
+                        <!-- stars -->
+                        <rect id="slm" x="0" y="185" width="80" height="46.4"
+                            style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
+                        <text x="15" class="text" y="215" fill="black">stairs</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col d-flex justify-content-center mt-5">
+                <button id="replayButton" onclick="replayLastTen()" disabled class="btn btn-success"
+                    style="margin-right: 20px;">replay last 10 readings</button>
+                <button id="keepTrackButton" onclick="keepTrack()" disabled class="btn btn-primary">Keep Track</button>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="./main.js"></script>
+<script>
+    swInit();
+</script>
+<script>
+
+    let ws = new WebSocket("ws://localhost:3000/client");
+    let readings = [];
+    let prevClass = null;
+
+    function msgCb(msg) {
+        console.log(`[RECIEVED]: ${msg.data}`);
+        if (prevClass) {
+            clearClass(prevClass);
+        }
+        classReached(msg.data);
+        readings.push(msg.data);
+        if (readings.length === 10) {
+            document.getElementById("replayButton").disabled = false;
+        } else if (readings.length > 10) {
+            readings.shift();
+        }
+        prevClass = msg.data;
+    }
+
+    function keepTrack() {
+        ws.onmessage = msgCb;
+        const replayButton = document.getElementById("replayButton");
+        const keepTrackButton = document.getElementById("keepTrackButton");
+        replayButton.disabled = true;
+        keepTrackButton.disabled = true;
+    }
+
+    function classReached(id) {
+        const element = document.getElementById(id);
+        element.setAttribute("style", "fill:red;stroke:black;stroke-width:1;opacity:0.8");
+    }
+
+    function clearClass(id) {
+        const element = document.getElementById(id);
+        element.setAttribute("style", "fill:white;stroke-width:1;stroke:rgb(0,0,0)");
+    }
+
+    function isMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    function replayLastTen() {
+        ws.onmessage = () => { };
+        const keepTrackButton = document.getElementById("keepTrackButton");
+        const replayButton = document.getElementById("replayButton");
+        replayButton.disabled = true;
+        keepTrackButton.disabled = true;
+        const intID = setInterval(function () {
+            if (readings.length === 0) {
+                keepTrackButton.disabled = false;
+                clearInterval(intID);
+            }
+            clearClass(prevClass);
+            prevClass = readings.shift();
+            classReached(prevClass);
+        }, 2000);
+    }
+
+    if (isMobile()) {
+        setWidth(330);
+        setHeight(220);
+        const texts = document.getElementsByClassName("text");
+        for (let i = 0; i < texts.length; i++) {
+            texts[i].setAttribute("x", Number(texts[i].getAttribute("x")) - 5);
+        }
+    } else {
+        scale(0.9, 0.9);
+    }
+
+    function setWidth(width) {
+        const svg = document.getElementById("svg");
+        scale(width / 1230, 1);
+    }
+
+    function setHeight(height) {
+        const svg = document.getElementById("svg");
+        scale(1, height / 437);
+    }
+
+    function scale(x, y) {
+        const svg = document.getElementById("svg");
+        let svgWidth = svg.getAttribute("width");
+        let svgHeight = svg.getAttribute("height");
+        svg.setAttribute("width", String(Number(svgWidth) * x));
+        svg.setAttribute("height", String(Number(svgHeight) * y));
+        for (let i = 0; i < svg.children.length; i++) {
+            if (svg.children[i].id === "Line") {
+                let currX1 = svg.children[i].getAttribute("x1");
+                let currY1 = svg.children[i].getAttribute("y1");
+                let currX2 = svg.children[i].getAttribute("x2");
+                let currY2 = svg.children[i].getAttribute("y2");
+                svg.children[i].setAttribute("x1", String(Number(currX1) * x));
+                svg.children[i].setAttribute("y1", String(Number(currY1) * y));
+                svg.children[i].setAttribute("x2", String(Number(currX2) * x));
+                svg.children[i].setAttribute("y2", String(Number(currY2) * y));
+            }
+            let currX = svg.children[i].getAttribute("x");
+            let currY = svg.children[i].getAttribute("y");
+            let currWidth = svg.children[i].getAttribute("width");
+            let currHeight = svg.children[i].getAttribute("height");
+            svg.children[i].setAttribute("x", String(Number(currX) * x));
+            svg.children[i].setAttribute("y", String(Number(currY) * y));
+            svg.children[i].setAttribute("width", String(Number(currWidth) * x));
+            svg.children[i].setAttribute("height", String(Number(currHeight) * y));
+        }
+    }
+
+    ws.onopen = () => {
+        console.log("[CONNECTED]");
+    }
+    ws.onclose = () => {
+        console.log("[DISCONNECTED]");
+    }
+    ws.onmessage = msgCb;
+</script>
+
+</html>
