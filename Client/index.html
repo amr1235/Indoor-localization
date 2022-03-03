@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="./manifest.json">
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <title>Indoor localization</title>
     <style>
@@ -50,7 +51,7 @@
                         <!-- third class -->
                         <rect id="class3" x="833.6" y="185" width="300.2" height="46.4"
                             style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
-                        <text x="930" class="text" y="215" fill="black">corridor 2</text>
+                        <text x="930" class="text" y="215" fill="black">corridor 3</text>
                         <!-- elmodarg class -->
                         <rect id="Modarg" x="855.6" y="232" width="278.2" height="202.6"
                             style="fill:white;stroke-width:1;stroke:rgb(0,0,0)" />
@@ -70,7 +71,8 @@
         </div>
         <div class="row justify-content-center">
             <div class="col d-flex justify-content-center mt-5">
-                <button id="replayButton" onclick="replayLastTen()" disabled class="btn btn-success" style="margin-right: 20px;">replay last 10 readings</button>
+                <button id="replayButton" onclick="replayLastTen()" disabled class="btn btn-success"
+                    style="margin-right: 20px;">replay last 10 readings</button>
                 <button id="keepTrackButton" onclick="keepTrack()" disabled class="btn btn-primary">Keep Track</button>
             </div>
         </div>
@@ -81,23 +83,65 @@
     swInit();
 </script>
 <script>
+
     let ws = new WebSocket("ws://localhost:3000/client");
     let readings = [];
+    let prevClass = null;
+
+    function msgCb(msg) {
+        console.log(`[RECIEVED]: ${msg.data}`);
+        if (prevClass) {
+            clearClass(prevClass);
+        }
+        classReached(msg.data);
+        readings.push(msg.data);
+        if (readings.length === 10) {
+            document.getElementById("replayButton").disabled = false;
+        } else if (readings.length > 10) {
+            readings.shift();
+        }
+        prevClass = msg.data;
+    }
+
     function keepTrack() {
-        ws = new WebSocket("ws://localhost:3000/client");
+        ws.onmessage = msgCb;
         const replayButton = document.getElementById("replayButton");
         const keepTrackButton = document.getElementById("keepTrackButton");
         replayButton.disabled = true;
         keepTrackButton.disabled = true;
     }
+
     function classReached(id) {
         const element = document.getElementById(id);
         element.setAttribute("style", "fill:red;stroke:black;stroke-width:1;opacity:0.8");
     }
+
     function clearClass(id) {
         const element = document.getElementById(id);
         element.setAttribute("style", "fill:white;stroke-width:1;stroke:rgb(0,0,0)");
     }
+
+    function isMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    function replayLastTen() {
+        ws.onmessage = () => { };
+        const keepTrackButton = document.getElementById("keepTrackButton");
+        const replayButton = document.getElementById("replayButton");
+        replayButton.disabled = true;
+        keepTrackButton.disabled = true;
+        const intID = setInterval(function () {
+            if (readings.length === 0) {
+                keepTrackButton.disabled = false;
+                clearInterval(intID);
+            }
+            clearClass(prevClass);
+            prevClass = readings.shift();
+            classReached(prevClass);
+        }, 2000);
+    }
+
     if (isMobile()) {
         setWidth(330);
         setHeight(220);
@@ -108,50 +152,17 @@
     } else {
         scale(0.9, 0.9);
     }
-    function sleep(millisecond) {
-        const date = Date.now();
-        let currDate = null;
-        do{
-            currDate = Date.now();
-        }while((currDate - date) < millisecond);
-    }
-    function replayLastTen(){
-        ws.close()
-        const keepTrackButton = document.getElementById("keepTrackButton");
-        const replayButton = document.getElementById("replayButton");
-        replayButton.disabled = true;
-        keepTrackButton.disabled = true;
-        ws.clo
-        let i = 0;
-        let prevClass = null;
-        const intID = setInterval(function(){
-            if(readings.length === 0) {
-                clearClass(prevClass);
-                keepTrackButton.disabled = false;
-                clearInterval(intID);
-            }
-            if(prevClass){
-                clearClass(prevClass);
-            }
-            let cl = readings.shift();
-            classReached(cl);
-            prevClass = cl;
-            i++;
-        },1000);
-    }
-    function isMobile() {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    }
-    if (window.innerWidth <= 400) {
-    }
+
     function setWidth(width) {
         const svg = document.getElementById("svg");
         scale(width / 1230, 1);
     }
+
     function setHeight(height) {
         const svg = document.getElementById("svg");
         scale(1, height / 437);
     }
+
     function scale(x, y) {
         const svg = document.getElementById("svg");
         let svgWidth = svg.getAttribute("width");
@@ -179,28 +190,14 @@
             svg.children[i].setAttribute("height", String(Number(currHeight) * y));
         }
     }
+
     ws.onopen = () => {
-        let data = true;
         console.log("[CONNECTED]");
     }
     ws.onclose = () => {
         console.log("[DISCONNECTED]");
     }
-    let prevClass = null;
-    ws.onmessage = (msg) => {
-        console.log(`[RECIEVED]: ${msg.data}`);
-        if(prevClass) {
-            clearClass(prevClass);
-        }
-        classReached(msg.data);
-        readings.push(msg.data);
-        if(readings.length === 10){
-            document.getElementById("replayButton").disabled = false;
-        }else if (readings.length > 10 ) {
-            readings.shift();
-        }
-        prevClass = msg.data;
-    }
+    ws.onmessage = msgCb;
 </script>
 
 </html>
