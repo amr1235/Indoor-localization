@@ -10,8 +10,11 @@
   "author": "amr,zeyad",
   "license": "ISC",
   "dependencies": {
+    "child_process": "^1.0.2",
     "cors": "^2.8.5",
     "express": "^4.17.3",
+    "mongodb": "^4.4.1",
+    "mongoose": "^6.2.8",
     "ws": "^8.5.0"
   }
 }
