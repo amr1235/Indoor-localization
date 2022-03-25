@@ -1,6 +1,6 @@
 const { EventEmitter } = require("events");
 const { Server } = require("ws");
-const { spawn } = require('child_process');
+const spawn = require('child_process').spawn;
 const ls = spawn('python', ['process.py']);
 const express = require("express");
 const cors = require("cors");
@@ -29,27 +29,24 @@ const subscribers = [];
 let publisher = null;
 
 let currentData = {
-    HeartRate : null,
-    Location : null,
-    Date : null
+    HeartRate: null,
+    Location: null
 }
 ls.stdout.on('data', (predictedValue) => {
-    console.log("Prediction: " + predictedValue.toString());
-    // subscribers.forEach((sub) => {
-    //     // sub.send(predictedValue, { binary: false });
-    //     currentData.Location = predictedValue.toString();
-    // });
-    // console.log(predictedValue.toString());
+    currentData.Location = predictedValue.toString();
+    // add reading to dataBase
+    patient.InserReading(currentData.HeartRate,currentData.Location);
+    subscribers.forEach((sub) => {
+        sub.send(JSON.stringify(currentData), { binary: false });
+    });
 });
 
 bus.on("update", (data) => {
     if (data.toString()) {
         let records = JSON.parse(data.toString());
         console.log("heartRate : " + records["heartrate"] + " | " + "strengths : " + records["Strengths"]);
-        ls.stdin.write("test", () => { });
-        let currDate = new Date(Date.now());
+        ls.stdin.write(records["Strengths"].toString() + "\n", () => { });
         currentData.HeartRate = records["heartrate"];
-        currentData.Date = currDate.toISOString();
     }
 });
 
@@ -88,6 +85,9 @@ ls.on('close', (code) => {
     console.log("child process exited with code ${code}");
 });
 
-setInterval(() => {
-    ls.stdin.write("3", () => { });
-}, 500);
+// setInterval(() => {
+//     ls.stdin.setEncoding('utf-8');
+//     // ls.stdout.pipe(process.stdout);
+//     ls.stdin.write("console.log('Hello from PhaxntomJS')\n");
+//     // ls.stdin.end(); /// this call seems necessary, at least with plain node.js executable
+// }, 1000);
